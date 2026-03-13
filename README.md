@@ -47,3 +47,16 @@ El sistema se apoya en las siguientes tablas principales de Supabase:
 2. Instalar las dependencias:
    ```bash
    npm install
+3. Configurar las variables de entorno. Crear un archivo .env en la raíz con las credenciales de Supabase:
+    ```bash
+    VITE_SUPABASE_URL=tu_url_de_supabase
+    VITE_SUPABASE_ANON_KEY=tu_clave_anonima_de_supabase
+4. Levantar el servidor de desarrollo:
+    ```bash
+    npm run dev
+5. Para compilar a producción y probar la PWA localmente:
+    ```bash
+    npm run build
+    npm run preview
+--
+Desarrollado por CesarJam94 - v.1.0

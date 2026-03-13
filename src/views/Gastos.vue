@@ -70,23 +70,14 @@
           class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-4 transition-all border border-gray-100 dark:border-gray-700 flex items-center gap-4 hover:shadow-md"
         >
           <div 
-            class="w-12 h-12 rounded-full flex items-center justify-center shrink-0 shadow-sm"
+            class="w-12 h-12 rounded-full flex items-center justify-center shrink-0 shadow-sm p-2"
             :class="item.tipo === 'ingreso' ? categoriasMap.ingreso.color : (categoriasMap[item.categoria]?.color || categoriasMap.otro.color)"
           >
-            <svg 
-              class="w-6 h-6" 
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24" 
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path 
-                stroke-linecap="round" 
-                stroke-linejoin="round" 
-                stroke-width="2" 
-                :d="item.tipo === 'ingreso' ? categoriasMap.ingreso.iconPath : (categoriasMap[item.categoria]?.iconPath || categoriasMap.otro.iconPath)"
-              ></path>
-            </svg>
+            <img 
+              :src="item.tipo === 'ingreso' ? categoriasMap.ingreso.imgUrl : (categoriasMap[item.categoria]?.imgUrl || categoriasMap.otro.imgUrl)" 
+              :alt="item.categoria"
+              class="w-full h-full object-contain drop-shadow-sm"
+            />
           </div>
 
           <div class="flex-grow min-w-0">
@@ -272,49 +263,49 @@ const cerrarConEsc = (e) => {
 //Categorias
 const categoriasMap = {
   entretenimiento: { 
-    color: 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400', 
+    color: 'bg-purple-100 dark:bg-purple-900/30', 
     texto: 'Entretenimiento',
-    iconPath: 'M7 4V20M17 4V20M3 8H7M17 8H21M3 12H21M3 16H7M17 16H21M4 20H20C21.1046 20 22 19.1046 22 18V6C22 4.89543 21.1046 4 20 4H4C2.89543 4 2 4.89543 2 6V18C2 19.1046 2.89543 20 4 20Z' 
+    imgUrl: 'https://img.icons8.com/?size=100&id=vzJRN9S0Db0Q&format=png&color=000000' 
   },
   automovil: { 
-    color: 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400', 
+    color: 'bg-blue-100 dark:bg-blue-900/30', 
     texto: 'Automóvil',
-    iconPath: 'M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10 M17.9 7l-2.4 9' 
+    imgUrl: 'https://img.icons8.com/?size=100&id=hwOJ5x33ywg6&format=png&color=000000' 
   },
   escuela: { 
-    color: 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400', 
+    color: 'bg-indigo-100 dark:bg-indigo-900/30', 
     texto: 'Escuela',
-    iconPath: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253'
+    imgUrl: 'https://img.icons8.com/?size=100&id=9HuXC128p4_T&format=png&color=000000'
   },
   salud: { 
-    color: 'bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400', 
+    color: 'bg-rose-100 dark:bg-rose-900/30', 
     texto: 'Salud',
-    iconPath: 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z'
+    imgUrl: 'https://img.icons8.com/?size=100&id=trsCZxEJArXb&format=png&color=000000'
   },
   gimnasio: { 
-    color: 'bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400', 
+    color: 'bg-zinc-200 dark:bg-zinc-800/50', 
     texto: 'Gimnasio',
-    iconPath: 'M3.5 11l-1.5 1.5l1.5 1.5 M20.5 11l1.5 1.5l-1.5 1.5 M10 8l4 0 M10 16l4 0 M8 8v8 M16 8v8'
+    imgUrl: 'https://img.icons8.com/?size=100&id=eqJxioVaWa0N&format=png&color=000000'
   },
   comida: { 
-    color: 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400', 
+    color: 'bg-green-100 dark:bg-green-900/30', 
     texto: 'Comida',
-    iconPath: 'M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z'
+    imgUrl: 'https://img.icons8.com/?size=100&id=as4wAkWJZrIK&format=png&color=000000'
   },
   servicios: { 
-    color: 'bg-yellow-100 text-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-400', 
+    color: 'bg-yellow-100 dark:bg-yellow-900/30', 
     texto: 'Servicios',
-    iconPath: 'M13 10V3L4 14h7v7l9-11h-7z'
+    imgUrl: 'https://img.icons8.com/?size=100&id=zqNjrHRmmsQI&format=png&color=000000'
   },
   ingreso: { 
-    color: 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400', 
+    color: 'bg-emerald-100 dark:bg-emerald-900/30', 
     texto: 'Ingreso',
-    iconPath: 'M12 8c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3-1.343-3-3-3z M12 2a10 10 0 100 20 10 10 0 000-20z M12 18V6 M14 12h-4'
+    imgUrl: 'https://img.icons8.com/?size=100&id=yUTNKgUuTlsA&format=png&color=000000'
   },
   otro: { 
-    color: 'bg-slate-100 text-slate-600 dark:bg-slate-900/30 dark:text-slate-400', 
+    color: 'bg-slate-100 dark:bg-slate-900/30', 
     texto: 'Otro',
-    iconPath: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4'
+    imgUrl: 'https://img.icons8.com/?size=100&id=hANsGH9seK9Q&format=png&color=000000' // Icono genérico de caja
   }
 }
 

@@ -17,6 +17,47 @@
           <input v-model="form.fecha" type="date" required class="w-full border dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md px-3 py-2 focus:ring-blue-500">
         </div>
 
+        <div v-if="form.tipo === 'gasto'" class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Categoría</label>
+          <select v-model="form.categoria" class="w-full border dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md px-3 py-2 focus:ring-blue-500">
+            <optgroup label="🥖 Alimentación">
+              <option value="comida">Despensa / Canasta Básica</option>
+              <option value="comida">Restaurantes / Salidas</option>
+            </optgroup>
+            <optgroup label="🏠 Hogar y Servicios">
+              <option value="servicios">Luz / Agua / Gas</option>
+              <option value="servicios">Internet (Izzi/Infinitum)</option>
+              <option value="servicios">Mantenimiento</option>
+            </optgroup>
+            <optgroup label="🚗 Transporte">
+              <option value="automovil">Gasolina</option>
+              <option value="automovil">Mecánico / Reparación</option>
+              <option value="automovil">Seguro / Tenencia</option>
+            </optgroup>
+            <optgroup label="🎬 Entretenimiento">
+              <option value="entretenimiento">Streaming (Spotify, Netflix, YouTube)</option>
+              <option value="entretenimiento">Cine / Eventos</option>
+            </optgroup>
+            <optgroup label="📚 Educación">
+              <option value="escuela">Colegiatura / Inscripción</option>
+              <option value="escuela">Materiales / Libros</option>
+            </optgroup>
+            <optgroup label="🏥 Salud">
+              <option value="salud">Consulta</option>
+              <option value="salud">Medicinas</option>
+              <option value="salud">Estudios/Laboratorio</option>
+            </optgroup>
+            <optgroup label="💪 Gimnasio">
+              <option value="gimnasio">Mensualidad</option>
+              <option value="gimnasio">Entrenador</option>
+              <option value="gimnasio">Suplementos</option>
+              <option value="gimnasio">Aguas/Suero</option>
+            </optgroup>
+
+            <option value="otro">📦 Otro</option>
+          </select>
+        </div>
+
         <div class="mb-4">
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Concepto</label>
           <input v-model="form.concepto" type="text" required placeholder="Ej. Pago de luz..." class="w-full border dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md px-3 py-2 focus:ring-blue-500">
@@ -26,6 +67,8 @@
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Monto</label>
           <input v-model="form.monto" type="number" step="0.01" required placeholder="0.00" class="w-full border dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md px-3 py-2 focus:ring-blue-500">
         </div>
+
+        
 
         <div v-if="form.tipo === 'gasto'" class="mb-4 flex items-center">
           <input v-model="form.estatus" type="checkbox" id="estatus" class="h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700 focus:ring-blue-500">
@@ -64,11 +107,11 @@ const guardando = ref(false)
 const archivoTemporal = ref(null)
 
 const form = ref({
-  id: null,
   tipo: 'gasto',
+  categoria: 'comida',
   fecha: new Date().toISOString().split('T')[0],
   concepto: '',
-  monto: '',
+  monto: null,
   estatus: false,
   comprobante_url: null
 })
@@ -110,6 +153,7 @@ const guardarMovimiento = async () => {
     const payload = {
       user_id: user.id,
       tipo: form.value.tipo,
+      categoria: form.value.tipo === 'gasto' ? form.value.categoria : 'ingreso',
       fecha: form.value.fecha,
       concepto: form.value.concepto,
       monto: parseFloat(form.value.monto),
@@ -131,4 +175,5 @@ const guardarMovimiento = async () => {
     guardando.value = false
   }
 }
+
 </script>

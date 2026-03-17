@@ -82,7 +82,7 @@
 
           <div class="flex-grow min-w-0">
             <div class="flex items-center gap-2">
-              <p class="text-base text-gray-800 dark:text-white truncate leading-tight">
+              <p class="text-base font-bold text-gray-800 dark:text-white truncate leading-tight">
                 {{ item.concepto }}
               </p>
               

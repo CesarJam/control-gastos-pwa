@@ -85,14 +85,7 @@
               <p class="text-base text-gray-800 dark:text-white truncate leading-tight">
                 {{ item.concepto }}
               </p>
-              <span v-if="item.tipo === 'gasto'" 
-                :class="item.estatus
-                 ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300'
-                 : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'"
-                class="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-tighter"
-              >
-                {{ item.estatus ? 'Pagado' : 'Pendiente' }}
-              </span>
+              
             </div>
             <p class="text-xs text-gray-500 dark:text-gray-400 font-medium">
               {{ item.tipo === 'ingreso' ? 'Abono' : (categoriasMap[item.categoria]?.texto || 'Gasto') }} • {{ item.fecha }}
@@ -106,6 +99,14 @@
             >
               {{ item.tipo === 'ingreso' ? '+' : '-' }}${{ item.monto.toLocaleString() }}
             </span>
+            <span v-if="item.tipo === 'gasto'" 
+                :class="item.estatus
+                 ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300'
+                 : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'"
+                class="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-tighter"
+              >
+                {{ item.estatus ? 'Pagado' : 'Pendiente' }}
+              </span>
             <div class="flex gap-2">
               <button @click="abrirComprobante(item.comprobante_url)" v-if="item.comprobante_url" class="text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 p-1 rounded-md transition-colors">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>

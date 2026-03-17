@@ -82,9 +82,9 @@
 
           <div class="flex-grow min-w-0">
             <div class="flex items-center gap-2">
-              <h4 class="text-base font-bold text-gray-800 dark:text-white truncate leading-tight">
+              <p class="text-base text-gray-800 dark:text-white truncate leading-tight">
                 {{ item.concepto }}
-              </h4>
+              </p>
               <span v-if="item.tipo === 'gasto'" 
                 :class="item.estatus
                  ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300'

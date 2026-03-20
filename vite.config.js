@@ -12,7 +12,7 @@ export default defineConfig({
       },
       manifest: {
         name: 'Control de Gastos',
-        short_name: 'Gastos',
+        short_name: 'Control Gastos',
         description: 'Sistema de control financiero personal y por quincenas',
         theme_color: '#ffffff',
         background_color: '#f9fafb',

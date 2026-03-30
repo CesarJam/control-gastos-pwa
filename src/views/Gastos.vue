@@ -151,10 +151,9 @@
 
                     <div class="flex-grow min-w-0">
                         <div class="flex items-center gap-2">
-                            <p class="text-base font-bold text-gray-800 dark:text-white truncate leading-tight">
+                            <p class="text-base font-bold text-gray-800 dark:text-white leading-tight break-words">
                                 {{ item.concepto }}
                             </p>
-
                         </div>
                         <p class="text-xs text-gray-500 dark:text-gray-400 font-medium">
                             {{ item.tipo === 'ingreso' ? 'Abono' : (categoriasMap[item.categoria]?.texto || 'Gasto') }}

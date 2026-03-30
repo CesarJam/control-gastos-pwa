@@ -1,6 +1,6 @@
 <template>
-  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md shadow-xl transition-colors duration-200">
+  <div class="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
+    <div class="bg-white dark:bg-gray-800 rounded-lg p-5 md:p-6 w-full max-w-md shadow-xl transition-colors duration-200 max-h-[90vh] overflow-y-auto">
       <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">{{ modoEdicion ? 'Editar' : 'Nuevo' }} Registro</h2>
       
       <form @submit.prevent="guardarMovimiento">

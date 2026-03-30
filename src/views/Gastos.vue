@@ -248,12 +248,16 @@ const searchQuery = ref('')
 // Lógica del modo oscuro
 const toggleDark = () => {
     isDark.value = !isDark.value
+    const metaThemeColor = document.getElementById('theme-color-meta') 
+
     if (isDark.value) {
         document.documentElement.classList.add('dark')
         localStorage.setItem('theme', 'dark')
+        if (metaThemeColor) metaThemeColor.setAttribute('content', '#111827') 
     } else {
         document.documentElement.classList.remove('dark')
         localStorage.setItem('theme', 'light')
+        if (metaThemeColor) metaThemeColor.setAttribute('content', '#f9fafb')
     }
 }
 
@@ -294,10 +298,16 @@ const balance = computed(() => totalIngresos.value - totalGastos.value)
 
 onMounted(() => {
     // Revisar si ya había seleccionado modo oscuro antes
+    const metaThemeColor = document.getElementById('theme-color-meta')
+
     if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
         isDark.value = true
         document.documentElement.classList.add('dark')
+        if (metaThemeColor) metaThemeColor.setAttribute('content', '#111827')
+    } else {
+        if (metaThemeColor) metaThemeColor.setAttribute('content', '#f9fafb')
     }
+    
     fetchMovimientos()
     window.addEventListener('keydown', cerrarConEsc)
 })

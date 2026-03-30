@@ -14,8 +14,8 @@ export default defineConfig({
         name: 'Control de Gastos',
         short_name: 'Control Gastos',
         description: 'Sistema de control financiero personal y por quincenas',
-        theme_color: '#ffffff',
-        background_color: '#f9fafb',
+        theme_color: '#111827',
+        background_color: '#111827',
         display: 'standalone',
         icons: [
           {

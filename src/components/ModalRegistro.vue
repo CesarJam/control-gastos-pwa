@@ -17,45 +17,32 @@
           <input v-model="form.fecha" type="date" required class="w-full border dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md px-3 py-2 focus:ring-blue-500">
         </div>
 
-        <div v-if="form.tipo === 'gasto'" class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Categoría</label>
-          <select v-model="form.categoria" class="w-full border dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md px-3 py-2 focus:ring-blue-500">
-            <optgroup label="🥖 Alimentación">
-              <option value="comida">Despensa / Canasta Básica</option>
-              <option value="comida">Restaurantes / Salidas</option>
-            </optgroup>
-            <optgroup label="🏠 Hogar y Servicios">
-              <option value="servicios">Luz / Agua / Gas</option>
-              <option value="servicios">Internet (Izzi/Infinitum)</option>
-              <option value="servicios">Mantenimiento</option>
-            </optgroup>
-            <optgroup label="🚗 Transporte">
-              <option value="automovil">Gasolina</option>
-              <option value="automovil">Mecánico / Reparación</option>
-              <option value="automovil">Seguro / Tenencia</option>
-            </optgroup>
-            <optgroup label="🎬 Entretenimiento">
-              <option value="entretenimiento">Streaming (Spotify, Netflix, YouTube)</option>
-              <option value="entretenimiento">Cine / Eventos</option>
-            </optgroup>
-            <optgroup label="📚 Educación">
-              <option value="escuela">Colegiatura / Inscripción</option>
-              <option value="escuela">Materiales / Libros</option>
-            </optgroup>
-            <optgroup label="🏥 Salud">
-              <option value="salud">Consulta</option>
-              <option value="salud">Medicinas</option>
-              <option value="salud">Estudios/Laboratorio</option>
-            </optgroup>
-            <optgroup label="💪 Gimnasio">
-              <option value="gimnasio">Mensualidad</option>
-              <option value="gimnasio">Entrenador</option>
-              <option value="gimnasio">Suplementos</option>
-              <option value="gimnasio">Aguas/Suero</option>
-            </optgroup>
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Categoría</label>
+          
+          <div class="grid grid-cols-3 sm:grid-cols-4 gap-2 md:gap-3 max-h-60 overflow-y-auto p-1 scrollbar-hide">
+            
+            <button 
+              v-for="(cat, key) in categoriasMap" 
+              :key="key"
+              type="button"
+              @click="form.categoria = key"
+              class="flex flex-col items-center justify-start p-2 md:p-3 rounded-xl border-2 transition-all duration-200"
+              :class="form.categoria === key 
+                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 shadow-sm' 
+                : 'border-transparent bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-600'"
+            >
+              <div class="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center mb-2 shadow-sm p-2 shrink-0" :class="cat.color">
+                <img :src="cat.imgUrl" :alt="cat.texto" class="w-full h-full object-contain drop-shadow-sm" />
+              </div>
+              
+              <span class="text-[10px] md:text-xs font-semibold text-center leading-tight break-words w-full"
+                :class="form.categoria === key ? 'text-blue-700 dark:text-blue-400' : 'text-gray-600 dark:text-gray-300'">
+                {{ cat.texto }}
+              </span>
+            </button>
 
-            <option value="otro">📦 Otro</option>
-          </select>
+          </div>
         </div>
 
         <div class="mb-4">
@@ -106,15 +93,70 @@ const emit = defineEmits(['cerrar', 'guardado'])
 const guardando = ref(false)
 const archivoTemporal = ref(null)
 
+const obtenerFechaLocal = () => {
+  const fecha = new Date()
+  fecha.setMinutes(fecha.getMinutes() - fecha.getTimezoneOffset())
+  return fecha.toISOString().split('T')[0]
+}
+
 const form = ref({
   tipo: 'gasto',
   categoria: 'comida',
-  fecha: new Date().toISOString().split('T')[0],
+  fecha: obtenerFechaLocal(),
   concepto: '',
   monto: null,
   estatus: false,
   comprobante_url: null
 })
+
+// AGREGA ESTO AQUÍ 👇
+const categoriasMap = {
+    entretenimiento: {
+        color: 'bg-purple-100 dark:bg-purple-900/30',
+        texto: 'Entretenimiento',
+        imgUrl: 'https://img.icons8.com/?size=100&id=vzJRN9S0Db0Q&format=png&color=000000'
+    },
+    automovil: {
+        color: 'bg-blue-100 dark:bg-blue-900/30',
+        texto: 'Automóvil',
+        imgUrl: 'https://img.icons8.com/?size=100&id=hwOJ5x33ywg6&format=png&color=000000'
+    },
+    escuela: {
+        color: 'bg-indigo-100 dark:bg-indigo-900/30',
+        texto: 'Escuela',
+        imgUrl: 'https://img.icons8.com/?size=100&id=9HuXC128p4_T&format=png&color=000000'
+    },
+    salud: {
+        color: 'bg-rose-100 dark:bg-rose-900/30',
+        texto: 'Salud',
+        imgUrl: 'https://img.icons8.com/?size=100&id=trsCZxEJArXb&format=png&color=000000'
+    },
+    gimnasio: {
+        color: 'bg-zinc-200 dark:bg-zinc-800/50',
+        texto: 'Gimnasio',
+        imgUrl: 'https://img.icons8.com/?size=100&id=eqJxioVaWa0N&format=png&color=000000'
+    },
+    comida: {
+        color: 'bg-green-100 dark:bg-green-900/30',
+        texto: 'Comida',
+        imgUrl: 'https://img.icons8.com/?size=100&id=as4wAkWJZrIK&format=png&color=000000'
+    },
+    servicios: {
+        color: 'bg-yellow-100 dark:bg-yellow-900/30',
+        texto: 'Servicios',
+        imgUrl: 'https://img.icons8.com/?size=100&id=zqNjrHRmmsQI&format=png&color=000000'
+    },
+    ingreso: {
+        color: 'bg-emerald-100 dark:bg-emerald-900/30',
+        texto: 'Ingreso',
+        imgUrl: 'https://img.icons8.com/?size=100&id=yUTNKgUuTlsA&format=png&color=000000'
+    },
+    otro: {
+        color: 'bg-slate-100 dark:bg-slate-900/30',
+        texto: 'Otro',
+        imgUrl: 'https://img.icons8.com/?size=100&id=hANsGH9seK9Q&format=png&color=000000'
+    }
+}
 
 // Si estamos editando, llenamos el formulario con los datos que nos pasaron
 onMounted(() => {

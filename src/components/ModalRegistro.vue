@@ -63,9 +63,29 @@
         </div>
 
         <div class="mb-6">
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Comprobante</label>
-          <input type="file" accept="image/*" @change="manejarArchivo" class="w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 dark:file:bg-gray-700 file:text-blue-700 dark:file:text-blue-400 hover:file:bg-blue-100 dark:hover:file:bg-gray-600">
-          <a v-if="form.comprobante_url" :href="form.comprobante_url" target="_blank" class="mt-2 inline-block text-sm text-blue-600 dark:text-blue-400 hover:underline">Ver comprobante actual</a>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Comprobante</label>
+          
+          <div class="flex gap-3">
+            <button type="button" @click="inputFoto.click()" class="flex-1 flex flex-col items-center justify-center gap-1 p-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-gray-700 hover:border-blue-400 transition-colors">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+              <span class="text-xs font-semibold">Tomar Foto</span>
+            </button>
+
+            <button type="button" @click="inputArchivo.click()" class="flex-1 flex flex-col items-center justify-center gap-1 p-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-gray-700 hover:border-blue-400 transition-colors">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+              <span class="text-xs font-semibold">Subir Archivo</span>
+            </button>
+          </div>
+
+          <input ref="inputFoto" type="file" accept="image/*" capture="environment" @change="manejarArchivo" class="hidden">
+          <input ref="inputArchivo" type="file" accept="image/*" @change="manejarArchivo" class="hidden">
+
+          <p v-if="archivoTemporal" class="mt-2 text-sm text-green-600 dark:text-green-400 flex items-center gap-1 font-medium">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            Imagen lista para guardar
+          </p>
+
+          <a v-if="form.comprobante_url && !archivoTemporal" :href="form.comprobante_url" target="_blank" class="mt-2 inline-block text-sm text-blue-600 dark:text-blue-400 hover:underline">Ver comprobante guardado</a>
         </div>
 
         <div class="flex justify-end gap-3">
@@ -92,6 +112,9 @@ const emit = defineEmits(['cerrar', 'guardado'])
 
 const guardando = ref(false)
 const archivoTemporal = ref(null)
+
+const inputFoto = ref(null)
+const inputArchivo = ref(null)
 
 const obtenerFechaLocal = () => {
   const fecha = new Date()

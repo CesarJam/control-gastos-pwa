@@ -84,43 +84,49 @@
 
             <div class="grid grid-cols-3 gap-2 md:gap-6 mb-8">
 
-                <div
-                    class="bg-white dark:bg-gray-800 p-3 md:p-6 rounded-xl shadow-sm border-b-4 md:border-b-0 md:border-l-4 border-green-500 transition-colors duration-200 flex flex-col items-center md:items-start justify-center">
+                <div @click="filtroTipo = 'ingreso'"
+                    class="cursor-pointer p-3 md:p-6 rounded-xl border-b-4 md:border-b-0 md:border-l-4 border-green-500 transition-all duration-300 flex flex-col items-center md:items-start justify-center"
+                    :class="filtroTipo === 'ingreso' 
+                        ? 'bg-white dark:bg-gray-800 shadow-lg scale-105 -translate-y-1 opacity-100 z-10' 
+                        : 'bg-gray-50 dark:bg-gray-800/60 shadow-sm scale-95 opacity-50 hover:opacity-70'">
                     <div class="flex items-center gap-2 mb-1 md:mb-0 text-gray-500 dark:text-gray-400">
                         <svg class="w-5 h-5 md:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
                         </svg>
                         <h3 class="hidden md:block text-sm font-semibold uppercase">Ingresos</h3>
                     </div>
-                    <p
-                        class="text-sm sm:text-base md:text-2xl font-bold text-green-600 dark:text-green-400 truncate w-full text-center md:text-left">
+                    <p class="text-sm sm:text-base md:text-2xl font-bold text-green-600 dark:text-green-400 truncate w-full text-center md:text-left">
                         ${{ totalIngresos.toFixed(2) }}
                     </p>
                 </div>
 
-                <div
-                    class="bg-white dark:bg-gray-800 p-3 md:p-6 rounded-xl shadow-sm border-b-4 md:border-b-0 md:border-l-4 border-red-500 transition-colors duration-200 flex flex-col items-center md:items-start justify-center">
+                <div @click="filtroTipo = 'gasto'"
+                    class="cursor-pointer p-3 md:p-6 rounded-xl border-b-4 md:border-b-0 md:border-l-4 border-red-500 transition-all duration-300 flex flex-col items-center md:items-start justify-center"
+                    :class="filtroTipo === 'gasto' 
+                        ? 'bg-white dark:bg-gray-800 shadow-lg scale-105 -translate-y-1 opacity-100 z-10' 
+                        : 'bg-gray-50 dark:bg-gray-800/60 shadow-sm scale-95 opacity-50 hover:opacity-70'">
                     <div class="flex items-center gap-2 mb-1 md:mb-0 text-gray-500 dark:text-gray-400">
                         <svg class="w-5 h-5 md:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M13 17h8m0 0v-8m0 8l-8-8-4 4-6-6"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0v-8m0 8l-8-8-4 4-6-6"></path>
                         </svg>
                         <h3 class="hidden md:block text-sm font-semibold uppercase">Gastos</h3>
                     </div>
-                    <p
-                        class="text-sm sm:text-base md:text-2xl font-bold text-red-600 dark:text-red-400 truncate w-full text-center md:text-left">
+                    <p class="text-sm sm:text-base md:text-2xl font-bold text-red-600 dark:text-red-400 truncate w-full text-center md:text-left">
                         ${{ totalGastos.toFixed(2) }}
                     </p>
                 </div>
 
-                <div class="bg-white dark:bg-gray-800 p-3 md:p-6 rounded-xl shadow-sm border-b-4 md:border-b-0 md:border-l-4 transition-colors duration-200 flex flex-col items-center md:items-start justify-center"
-                    :class="balance >= 0 ? 'border-blue-500' : 'border-yellow-500'">
+                <div @click="filtroTipo = 'todos'"
+                    class="cursor-pointer p-3 md:p-6 rounded-xl border-b-4 md:border-b-0 md:border-l-4 transition-all duration-300 flex flex-col items-center md:items-start justify-center"
+                    :class="[
+                        balance >= 0 ? 'border-blue-500' : 'border-yellow-500',
+                        filtroTipo === 'todos' 
+                            ? 'bg-white dark:bg-gray-800 shadow-lg scale-105 -translate-y-1 opacity-100 z-10' 
+                            : 'bg-gray-50 dark:bg-gray-800/60 shadow-sm scale-95 opacity-50 hover:opacity-70'
+                    ]">
                     <div class="flex items-center gap-2 mb-1 md:mb-0 text-gray-500 dark:text-gray-400">
                         <svg class="w-5 h-5 md:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z">
-                            </path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
                         </svg>
                         <h3 class="hidden md:block text-sm font-semibold uppercase truncate">Balance</h3>
                     </div>
@@ -136,12 +142,12 @@
                 class="p-8 text-center text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
                 Cargando movimientos...
             </div>
-            <div v-else-if="movimientosFiltrados.length === 0"
+            <div v-else-if="listaMovimientos.length === 0"
                 class="p-8 text-center text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
                 No hay registros en esta quincena.
             </div>
             <div v-else class="grid grid-cols-1 gap-3">
-                <div v-for="item in movimientosFiltrados" :key="item.id"
+                <div v-for="item in listaMovimientos" :key="item.id"
                     class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-4 transition-all border border-gray-100 dark:border-gray-700 flex items-center gap-4 hover:shadow-md">
                     <div class="w-12 h-12 rounded-full flex items-center justify-center shrink-0 shadow-sm p-2"
                         :class="item.tipo === 'ingreso' ? categoriasMap.ingreso.color : (categoriasMap[item.categoria]?.color || categoriasMap.otro.color)">
@@ -244,6 +250,15 @@ const filtro = ref({
 
 //Variable para busqueda
 const searchQuery = ref('')
+
+//Filtro rápido por tipo de tarjeta
+const filtroTipo = ref('todos')
+
+//Computada final para la lista visual (respeta fecha, búsqueda y tipo de tarjeta)
+const listaMovimientos = computed(() => {
+    if (filtroTipo.value === 'todos') return movimientosFiltrados.value
+    return movimientosFiltrados.value.filter(m => m.tipo === filtroTipo.value)
+})
 
 // Lógica del modo oscuro
 const toggleDark = () => {

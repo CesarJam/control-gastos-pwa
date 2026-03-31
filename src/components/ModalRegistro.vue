@@ -14,7 +14,8 @@
 
         <div class="mb-4">
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fecha</label>
-          <input v-model="form.fecha" type="date" required class="w-full border dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md px-3 py-2 focus:ring-blue-500">
+          <input v-model="form.fecha" type="date" required 
+            class="w-full border dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md px-3 py-2 focus:ring-blue-500 text-left [&::-webkit-date-and-time-value]:text-left appearance-none">
         </div>
 
         <div class="mb-4">

@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
+  <div class="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50" @click.self="emit('cerrar')">
     <div class="bg-white dark:bg-gray-800 rounded-lg p-5 md:p-6 w-full max-w-md shadow-xl transition-colors duration-200 max-h-[90vh] overflow-y-auto">
       <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">{{ modoEdicion ? 'Editar' : 'Nuevo' }} Registro</h2>
       
@@ -100,7 +100,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { supabase } from '../supabase'
 
 const props = defineProps({
@@ -115,6 +115,13 @@ const archivoTemporal = ref(null)
 
 const inputFoto = ref(null)
 const inputArchivo = ref(null)
+
+// Función para detectar la tecla Esc
+const cerrarConEsc = (e) => {
+  if (e.key === 'Escape') {
+    emit('cerrar')
+  }
+}
 
 const obtenerFechaLocal = () => {
   const fecha = new Date()
@@ -186,6 +193,12 @@ onMounted(() => {
   if (props.modoEdicion && props.itemInicial) {
     form.value = { ...props.itemInicial }
   }
+  window.addEventListener('keydown', cerrarConEsc)
+})
+
+// Dejar de escuchar el teclado al cerrar para limpiar la memoria
+onUnmounted(() => {
+  window.removeEventListener('keydown', cerrarConEsc)
 })
 
 const manejarArchivo = (event) => {

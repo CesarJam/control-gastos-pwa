@@ -1,5 +1,5 @@
 <template>
-    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 pb-24 md:p-8 transition-colors duration-200">
+    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 pb-24 md:p-8 transition-colors duration-200 select-none">
         <div class="max-w-5xl mx-auto">
 
             <div class="flex justify-between items-center mb-8">

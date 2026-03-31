@@ -303,9 +303,9 @@ onMounted(() => {
     if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
         isDark.value = true
         document.documentElement.classList.add('dark')
-        if (metaThemeColor) metaThemeColor.setAttribute('content', '#F27100') //111827
+        if (metaThemeColor) metaThemeColor.setAttribute('content', '#111827') 
     } else {
-        if (metaThemeColor) metaThemeColor.setAttribute('content', '#F2F200') //f9fafb
+        if (metaThemeColor) metaThemeColor.setAttribute('content', '#f9fafb') 
     }
     
     fetchMovimientos()

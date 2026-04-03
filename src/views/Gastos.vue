@@ -196,7 +196,7 @@
                                     </path>
                                 </svg>
                             </button>
-                            <button @click="eliminarMovimiento(item.id)" class="text-gray-400 hover:text-rose-600 p-1">
+                            <button @click="confirmarEliminar(item.id)" class="text-gray-400 hover:text-rose-600 p-1">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
@@ -209,7 +209,7 @@
             </div>
 
             <ModalRegistro v-if="mostrarModal" :modo-edicion="modoEdicion" :item-inicial="itemSeleccionado"
-                @cerrar="cerrarModal" @guardado="onGuardado" />
+                @cerrar="cerrarModal" @guardado="onGuardado" class="backdrop-blur-sm"/>
             <div v-if="comprobanteActivo"
                 class="fixed inset-0 bg-black/90 flex items-center justify-center p-4 z-[60] backdrop-blur-sm transition-opacity"
                 @click="cerrarComprobante">
@@ -224,6 +224,35 @@
                     class="max-w-full max-h-full object-contain rounded-md shadow-2xl" @click.stop />
             </div>
         </div>
+
+        <div v-if="mostrarModalEliminar" 
+                class="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-[70] backdrop-blur-sm transition-opacity" 
+                @click.self="cerrarModalEliminar">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-sm shadow-2xl transform transition-all text-center">
+                    <div class="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                    </div>
+                    
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">¿Eliminar registro?</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
+                        Esta acción no se puede deshacer. El registro se borrará permanentemente de tu historial.
+                    </p>
+                    
+                    <div class="flex gap-3 justify-center">
+                        <button @click="cerrarModalEliminar" :disabled="eliminando"
+                            class="flex-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-semibold transition-colors disabled:opacity-50">
+                            Cancelar
+                        </button>
+                        <button @click="ejecutarEliminacion" :disabled="eliminando" 
+                            class="flex-1 px-4 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl font-semibold transition-colors disabled:opacity-50 flex justify-center items-center">
+                            <span v-if="eliminando" class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></span>
+                            {{ eliminando ? 'Borrando...' : 'Sí, eliminar' }}
+                        </button>
+                    </div>
+                </div>
+            </div>
 
     </div>
 </template>
@@ -359,14 +388,38 @@ const comprobanteActivo = ref(null)
 const abrirComprobante = (url) => comprobanteActivo.value = url
 const cerrarComprobante = () => comprobanteActivo.value = null
 
-const eliminarMovimiento = async (id) => {
-    if (confirm('¿Estás seguro de que deseas eliminar este registro?')) {
-        await supabase.from('gastos').delete().eq('id', id)
+// Lógica del Modal de Eliminación
+const mostrarModalEliminar = ref(false)
+const idAEliminar = ref(null)
+const eliminando = ref(false)
+
+const confirmarEliminar = (id) => {
+    idAEliminar.value = id
+    mostrarModalEliminar.value = true
+}
+
+const cerrarModalEliminar = () => {
+    mostrarModalEliminar.value = false
+    idAEliminar.value = null
+}
+
+const ejecutarEliminacion = async () => {
+    if (!idAEliminar.value) return
+    
+    try {
+        eliminando.value = true
+        await supabase.from('gastos').delete().eq('id', idAEliminar.value)
         await fetchMovimientos()
+        cerrarModalEliminar()
+    } catch (error) {
+        console.error('Error al eliminar:', error)
+        alert('Hubo un error al eliminar el registro.')
+    } finally {
+        eliminando.value = false
     }
 }
 
-//Logica para cerrar modal
+//Logica para cerrar modal de registro
 const cerrarConEsc = (e) => {
     if (e.key === 'Escape' && comprobanteActivo.value) {
         cerrarComprobante()

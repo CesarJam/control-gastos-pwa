@@ -26,25 +26,40 @@ router.beforeEach(async (to, from, next) => {
 
   // Si hay sesión iniciada
   if (session) {
-    // Validar si el correo existe en nuestra tabla 'usuarios'
-    const { data: usuario, error } = await supabase
-      .from('usuarios')
-      .select('*')
-      .eq('email', session.user.email)
-      .single()
+    if (navigator.onLine) {
+      try {
+        const { data: usuario, error } = await supabase
+          .from('usuarios')
+          .select('*')
+          .eq('email', session.user.email)
+          .single()
 
-    // Si no existe el usuario o no está activo, destruimos la sesión
-    if (error || !usuario || !usuario.activo) {
-      await supabase.auth.signOut()
-      
-      // Si intentaba ir a otra ruta, lo mandamos al login con un parámetro de error
-      if (to.path !== '/') {
-        return next('/?error=no-autorizado')
+        // Evaluamos si el error es de conexión (Supabase usa la palabra 'fetch' en fallos de red)
+        const esErrorDeRed = error && error.message && error.message.toLowerCase().includes('fetch')
+
+        // Si NO es un error de red, entonces el servidor sí nos respondió
+        if (!esErrorDeRed) {
+          // PGRST116 es el código exacto de Supabase cuando un registro no existe
+          const noExiste = error && error.code === 'PGRST116'
+          const estaInactivo = usuario && usuario.activo === false
+
+          // SOLO te sacamos si estamos 100% seguros de que ya no tienes acceso
+          if (noExiste || estaInactivo) {
+            // Intentamos cerrar sesión (le ponemos un catch silencioso por si la red parpadea)
+            try { await supabase.auth.signOut() } catch(e) {}
+            
+            if (to.path !== '/') {
+              return next('/?error=no-autorizado')
+            }
+            return next() 
+          }
+        }
+      } catch (err) {
+        console.warn('Modo offline activo: Fallo de red al validar usuario.', err)
       }
-      return next() // Si ya estaba en el login, se queda ahí
     }
 
-    // Si el usuario es válido y está en el login, lo mandamos a gastos
+    // Si pasamos la validación o si la red falló, te dejamos entrar al dashboard
     if (to.path === '/') {
       return next('/gastos')
     }

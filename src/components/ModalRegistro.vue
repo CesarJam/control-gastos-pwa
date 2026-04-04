@@ -103,6 +103,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { supabase } from '../supabase'
+import { db } from '../db'
 
 const props = defineProps({
   modoEdicion: Boolean,
@@ -140,7 +141,7 @@ const form = ref({
   comprobante_url: null
 })
 
-// AGREGA ESTO AQUÍ 👇
+
 const categoriasMap = {
     entretenimiento: {
         color: 'bg-purple-100 dark:bg-purple-900/30',
@@ -222,15 +223,25 @@ const subirImagen = async (file) => {
 const guardarMovimiento = async () => {
   try {
     guardando.value = true
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { session } } = await supabase.auth.getSession()
+
+    // 1. Manejo de imágenes (Requiere internet por ahora)
     let urlComprobante = form.value.comprobante_url
-    
     if (archivoTemporal.value) {
+      if (!navigator.onLine) {
+        alert('Estás sin conexión. No se pueden subir imágenes por ahora, guarda el registro sin comprobante.')
+        guardando.value = false
+        return
+      }
       urlComprobante = await subirImagen(archivoTemporal.value)
     }
 
+    // 2. Crear el payload con un ID local (UUID) si es un nuevo registro
+    const registroId = props.modoEdicion ? form.value.id : crypto.randomUUID()
+
     const payload = {
-      user_id: user.id,
+      id: registroId,
+      user_id: session.user.id,
       tipo: form.value.tipo,
       categoria: form.value.tipo === 'gasto' ? form.value.categoria : 'ingreso',
       fecha: form.value.fecha,
@@ -240,13 +251,44 @@ const guardarMovimiento = async () => {
       comprobante_url: urlComprobante
     }
 
+    // 3. GUARDADO LOCAL (Inmediato)
     if (props.modoEdicion) {
-      await supabase.from('gastos').update(payload).eq('id', form.value.id)
+      await db.gastos.put(payload) // Actualiza en Dexie
     } else {
-      await supabase.from('gastos').insert([payload])
+      await db.gastos.add(payload) // Inserta en Dexie
     }
 
-    emit('guardado') // Le avisamos a la vista padre que terminamos
+    // 4. INTENTO DE SUBIDA O ENCOLADO
+    // 4. INTENTO DE SUBIDA O ENCOLADO
+    const operacion = props.modoEdicion ? 'UPDATE' : 'INSERT'
+
+    if (navigator.onLine) {
+      try {
+        let errorSupabase = null
+
+        // Si hay red, intentamos mandarlo a Supabase y CAPTURAMOS el error
+        if (props.modoEdicion) {
+          const { error } = await supabase.from('gastos').update(payload).eq('id', payload.id)
+          errorSupabase = error
+        } else {
+          const { error } = await supabase.from('gastos').insert([payload])
+          errorSupabase = error
+        }
+
+        // Si Supabase reporta un fallo (ej. falso internet), forzamos la excepción
+        if (errorSupabase) throw errorSupabase
+
+      } catch (error) {
+        // Ahora sí, el catch atrapará el error y lo mandará a la cola local
+        console.warn('Fallo de red al subir. Encolando operación.', error)
+        await db.cola_sincronizacion.add({ operacion, payload, timestamp: Date.now() })
+      }
+    } else {
+      // Si definitivamente no hay internet, directo a la cola
+      await db.cola_sincronizacion.add({ operacion, payload, timestamp: Date.now() })
+    }
+
+    emit('guardado') 
   } catch (error) {
     console.error('Error al guardar:', error)
     alert('Hubo un problema al guardar el registro.')

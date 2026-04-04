@@ -260,8 +260,10 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { supabase } from '../supabase'
+import { db } from '../db'
 import { useRouter } from 'vue-router'
 import ModalRegistro from '../components/ModalRegistro.vue'
+
 
 const router = useRouter()
 const loading = ref(true)
@@ -310,14 +312,94 @@ const handleLogout = async () => {
     router.push('/')
 }
 
-const fetchMovimientos = async () => {
-    loading.value = true
-    const { data: { user } } = await supabase.auth.getUser()
-    if (user) {
-        const { data, error } = await supabase.from('gastos').select('*').eq('user_id', user.id).order('fecha', { ascending: false })
-        if (!error && data) movimientos.value = data
+// Función para sincronizar datos pendientes con la nube
+const procesarColaSincronizacion = async () => {
+    // Si no hay internet, no intentamos nada
+    if (!navigator.onLine) return
+
+    // Leemos todas las tareas pendientes de la cola local
+    const pendientes = await db.cola_sincronizacion.toArray()
+    if (pendientes.length === 0) return
+
+    console.log(`Sincronizando ${pendientes.length} registros pendientes...`)
+
+    for (const item of pendientes) {
+        try {
+            if (item.operacion === 'INSERT') {
+                const { error } = await supabase.from('gastos').insert([item.payload])
+                // 23505 es el código de error de Postgres cuando un ID ya existe. 
+                // Lo ignoramos por si se subió antes y la red falló al borrar la cola.
+                if (error && error.code !== '23505') throw error 
+            } 
+            else if (item.operacion === 'UPDATE') {
+                const { error } = await supabase.from('gastos').update(item.payload).eq('id', item.payload.id)
+                if (error) throw error
+            }
+            else if (item.operacion === 'DELETE') {
+                const { error } = await supabase.from('gastos').delete().eq('id', item.payload.id)
+                if (error) throw error
+            }
+            
+            // Si la operación a Supabase tuvo éxito, borramos la tarea de la cola local
+            await db.cola_sincronizacion.delete(item.id)
+        } catch (error) {
+            console.error('Error al sincronizar el item:', item, error)
+            // Rompemos el ciclo (break) para no borrar las demás tareas si el internet es inestable
+            break 
+        }
     }
-    loading.value = false
+}
+
+const fetchMovimientos = async () => {
+    // Esto lee el token guardado en el celular de forma inmediata y sin internet
+    const { data: { session } } = await supabase.auth.getSession()
+    
+    // Si no hay sesión en la memoria local, detenemos la función
+    if (!session) return 
+    
+    const user = session.user
+
+    // 1. LECTURA LOCAL (Ultra-rápida)
+    const datosLocales = await db.gastos.where('user_id').equals(user.id).toArray()
+    movimientos.value = datosLocales.sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
+    
+    loading.value = false 
+
+    // 2. SINCRONIZACIÓN EN SEGUNDO PLANO (Pull de la nube)
+    if (navigator.onLine) { 
+        try {
+            await procesarColaSincronizacion()
+            
+            const { data: datosNube, error } = await supabase.from('gastos').select('*').eq('user_id', user.id)
+            
+            if (!error && datosNube) {
+                // 1. Actualizamos e insertamos lo que viene de la nube
+                await db.gastos.bulkPut(datosNube)
+                
+                // 2. NUEVO: Limpieza de registros eliminados en otros dispositivos
+                // Extraemos solo los IDs que existen actualmente en la nube
+                const idsNube = datosNube.map(item => item.id)
+                // Leemos todos los registros locales de este usuario
+                const datosLocales = await db.gastos.where('user_id').equals(user.id).toArray()
+                
+                // Filtramos los registros locales buscando cuáles YA NO están en la nube
+                const idsParaBorrar = datosLocales
+                    .filter(local => !idsNube.includes(local.id))
+                    .map(borrar => borrar.id)
+                
+                // Si encontramos registros "fantasmas", los borramos de Dexie
+                if (idsParaBorrar.length > 0) {
+                    await db.gastos.bulkDelete(idsParaBorrar)
+                }
+
+                // 3. Volvemos a leer la base local ya limpia y actualizada
+                const datosActualizados = await db.gastos.where('user_id').equals(user.id).toArray()
+                movimientos.value = datosActualizados.sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
+            }
+        } catch (error) {
+            console.log('Error silencioso de red al sincronizar.')
+        }
+    }
 }
 
 const movimientosFiltrados = computed(() => {
@@ -354,9 +436,13 @@ onMounted(() => {
     
     fetchMovimientos()
     window.addEventListener('keydown', cerrarConEsc)
+    //Escuchar cuando el internet regresa
+    window.addEventListener('online', procesarColaSincronizacion)
 })
 onUnmounted(() => {
     window.removeEventListener('keydown', cerrarConEsc)
+    //Dejar de escuchar para no consumir memoria
+    window.removeEventListener('online', procesarColaSincronizacion)
 })
 
 const mostrarModal = ref(false)

@@ -29,7 +29,7 @@
 
     <div class="absolute bottom-6 text-center w-full px-4">
       <p class="text-xs font-medium text-gray-400 dark:text-gray-500 tracking-wide">
-        Desarrollado por CesarJam94 - v.1.0
+        Desarrollado por CesarJam94 - v.2.0
       </p>
     </div>
 

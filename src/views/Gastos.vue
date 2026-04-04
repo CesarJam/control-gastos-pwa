@@ -494,11 +494,39 @@ const ejecutarEliminacion = async () => {
     
     try {
         eliminando.value = true
-        await supabase.from('gastos').delete().eq('id', idAEliminar.value)
+        
+        // Guardamos el ID en una variable antes de limpiar el estado
+        const id = idAEliminar.value
+        const payload = { id }
+        const operacion = 'DELETE'
+
+        // 1. ELIMINACIÓN LOCAL (Inmediata)
+        await db.gastos.delete(id)
+
+        // 2. INTENTO DE NUBE O ENCOLADO
+        if (navigator.onLine) {
+            try {
+                // Intentamos borrar en Supabase
+                const { error } = await supabase.from('gastos').delete().eq('id', id)
+                
+                // Si Supabase reporta un fallo (ej. falso internet), forzamos la excepción
+                if (error) throw error
+            } catch (error) {
+                // Si la red falla, lo mandamos a la cola local
+                console.warn('Fallo de red al eliminar. Encolando operación.', error)
+                await db.cola_sincronizacion.add({ operacion, payload, timestamp: Date.now() })
+            }
+        } else {
+            // Si no hay internet, directo a la cola
+            await db.cola_sincronizacion.add({ operacion, payload, timestamp: Date.now() })
+        }
+
+        // 3. Actualizamos la lista (ahora leerá de Dexie sin el registro) y cerramos el modal
         await fetchMovimientos()
         cerrarModalEliminar()
+
     } catch (error) {
-        console.error('Error al eliminar:', error)
+        console.error('Error al procesar la eliminación:', error)
         alert('Hubo un error al eliminar el registro.')
     } finally {
         eliminando.value = false

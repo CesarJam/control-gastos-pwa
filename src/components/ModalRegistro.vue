@@ -21,7 +21,7 @@
         <div class="mb-4">
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Categoría</label>
           
-          <div class="grid grid-cols-3 sm:grid-cols-4 gap-2 md:gap-3 max-h-60 overflow-y-auto p-1 scrollbar-hide">
+          <div class="grid grid-cols-4 sm:grid-cols-4 gap-2 md:gap-3 max-h-60 overflow-y-auto p-1 scrollbar-hide">
             
             <button 
               v-for="(cat, key) in categoriasVisibles" 

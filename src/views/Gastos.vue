@@ -422,12 +422,11 @@
       >
         No hay registros en esta quincena.
       </div>
-      <div v-else class="grid grid-cols-1 gap-3">
-        <div
+      <div v-else class="grid grid-cols-1 gap-1"> <div
           v-for="item in listaMovimientos"
           :key="item.id"
-          class="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-4 transition-all border border-gray-100 dark:border-gray-800 flex items-center gap-4 hover:shadow-md"
-        >
+          class="bg-white dark:bg-gray-900 rounded-2xl shadow-sm p-3 transition-all border border-gray-100 dark:border-gray-800 flex items-center gap-3 hover:shadow-md" 
+          >
           <div
             class="w-12 h-12 rounded-full flex items-center justify-center shrink-0 shadow-sm p-2"
             :class="

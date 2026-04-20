@@ -1,6 +1,6 @@
 <template>
   <div class="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50" @click.self="emit('cerrar')">
-    <div class="bg-white dark:bg-gray-800 rounded-lg p-5 md:p-6 w-full max-w-md shadow-xl transition-colors duration-200 max-h-[90vh] overflow-y-auto">
+    <div class="bg-white dark:bg-gray-900 rounded-lg p-5 md:p-6 w-full max-w-md shadow-xl transition-colors duration-200 max-h-[90vh] overflow-y-auto">
       <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">{{ modoEdicion ? 'Editar' : 'Nuevo' }} Registro</h2>
       
       <form @submit.prevent="guardarMovimiento">
@@ -24,7 +24,7 @@
           <div class="grid grid-cols-3 sm:grid-cols-4 gap-2 md:gap-3 max-h-60 overflow-y-auto p-1 scrollbar-hide">
             
             <button 
-              v-for="(cat, key) in categoriasMap" 
+              v-for="(cat, key) in categoriasVisibles" 
               :key="key"
               type="button"
               @click="form.categoria = key"
@@ -101,7 +101,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { supabase } from '../supabase'
 import { db } from '../db'
 
@@ -133,12 +133,41 @@ const obtenerFechaLocal = () => {
 
 const form = ref({
   tipo: 'gasto',
-  categoria: 'comida',
+  categoria: 'entretenimiento',
   fecha: obtenerFechaLocal(),
   concepto: '',
   monto: null,
   estatus: false,
   comprobante_url: null
+})
+
+// Vigila los cambios en "tipo" para auto-seleccionar la categoría
+watch(() => form.value.tipo, (nuevoTipo) => {
+  if (nuevoTipo === 'ingreso') {
+    form.value.categoria = 'ingreso'
+  } else if (nuevoTipo === 'gasto' && form.value.categoria === 'ingreso') {
+    // Si regresa a gasto, lo regresamos a una categoría por defecto
+    form.value.categoria = 'otro' 
+  }
+})
+
+// Filtra las categorías que se dibujan en pantalla
+const categoriasVisibles = computed(() => {
+  const filtradas = {}
+  
+  if (form.value.tipo === 'ingreso') {
+    // Si es ingreso, SOLO mostramos la categoría ingreso
+    filtradas['ingreso'] = categoriasMap['ingreso']
+  } else {
+    // Si es gasto, mostramos TODAS excepto ingreso
+    for (const [key, value] of Object.entries(categoriasMap)) {
+      if (key !== 'ingreso') {
+        filtradas[key] = value
+      }
+    }
+  }
+  
+  return filtradas
 })
 
 
@@ -258,7 +287,6 @@ const guardarMovimiento = async () => {
       await db.gastos.add(payload) // Inserta en Dexie
     }
 
-    // 4. INTENTO DE SUBIDA O ENCOLADO
     // 4. INTENTO DE SUBIDA O ENCOLADO
     const operacion = props.modoEdicion ? 'UPDATE' : 'INSERT'
 
